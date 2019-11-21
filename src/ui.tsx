@@ -2,6 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./ui.css";
 
+var data = require("./template.js");
+
 declare function require(path: string): any;
 
 class App extends React.Component {
@@ -21,9 +23,18 @@ class App extends React.Component {
       <div>
         <img src={require("./logo.svg")} />
         <h2>Tailwindcss.config.js Generator</h2>
-        <button id="create" onClick={console.log("Hey")}>
-          Generate
-        </button>
+
+        <div className="block-50">
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Necessitatibus, impedit, voluptas saepe sunt accusantium doloribus
+            tempore quisquam aut eaque dicta quidem? Quam optio esse voluptatem
+            assumenda, totam molestias soluta architecto.
+          </p>
+        </div>
+        <div className="block-50">{data}</div>
+
+        <button id="create">Generate</button>
         <button onClick={this.onCancel}>Cancel</button>
       </div>
     );
