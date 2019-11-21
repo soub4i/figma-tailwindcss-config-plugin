@@ -1,0 +1,7 @@
+{
+  "name": "Figma Tailwindcss config generator",
+  "id": "738168449509241862345",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html"
+}
