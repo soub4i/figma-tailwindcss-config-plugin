@@ -16,7 +16,7 @@ class App extends React.Component {
   textbox: HTMLInputElement;
 
   onCancel = () => {
-    parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+    parent.postMessage({ pluginMessage: { type: "close-ui" } }, "*");
   };
 
   render() {

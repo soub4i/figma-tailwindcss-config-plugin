@@ -22,5 +22,7 @@ figma.ui.onmessage = msg => {
     figma.ui.postMessage(textStyle);
   }
 
-  figma.closePlugin();
+  if (msg.type === "close-ui") {
+    figma.closePlugin();
+  }
 };
