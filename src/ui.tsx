@@ -2,37 +2,63 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./ui.css";
 
-var data = require("./template.js");
+const mapper = {
+  fontName: "fontFamily",
+  fontSize: "fontSize",
+  textDecoration: "textDecoration",
+  letterSpacing: "letterSpacing",
+  lineHeight: "lineHeight"
+};
+
+const textStyle = {};
 
 declare function require(path: string): any;
 
 class App extends React.Component {
   textbox: HTMLInputElement;
 
-  countRef = (element: HTMLInputElement) => {
-    if (element) element.value = "5";
-    this.textbox = element;
-  };
-
   onCancel = () => {
     parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
   };
 
   render() {
+    (() => {
+      for (const node of figma.currentPage.selection) {
+        Object.keys(mapper).map(property => {
+          if (node.type === "TEXT" && property in node) {
+            textStyle[mapper[property]] = node[property];
+          }
+        });
+      }
+    })();
+
     return (
       <div>
         <img src={require("./logo.svg")} />
         <h2>Tailwindcss.config.js Generator</h2>
 
-        <div className="block-50">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Necessitatibus, impedit, voluptas saepe sunt accusantium doloribus
-            tempore quisquam aut eaque dicta quidem? Quam optio esse voluptatem
-            assumenda, totam molestias soluta architecto.
-          </p>
+        <div className="grid-container">
+          <div className="grid-item">
+            <div className="code">
+              <h5>
+                <b>
+                  <i>HTML</i>
+                </b>
+              </h5>
+              <h5>
+                <b>
+                  <i>
+                    <a href="#you_stealer!_you-copied-my-code!">Copy</a>
+                  </i>
+                </b>
+              </h5>
+
+              <xmp>{JSON.stringify(textStyle, undefined, 2)}</xmp>
+            </div>
+          </div>
+
+          <div className="grid-item"></div>
         </div>
-        <div className="block-50">{data}</div>
 
         <button id="create">Generate</button>
         <button onClick={this.onCancel}>Cancel</button>

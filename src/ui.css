@@ -42,3 +42,33 @@ input:focus {
   margin-left: 10px;
   margin-right: 10px;
 }
+
+h5 {
+  margin: 0px;
+  background-color: #333;
+  color: white;
+  font-family: verdana, arial, serif, sans-serif;
+  font-size: 15px;
+  padding: 10px;
+}
+a {
+  text-decoration: none;
+  color: white;
+  float: right;
+  padding: 10px;
+}
+div.code {
+  width: 1000%;
+  background-color: #111;
+  font-family: verdana, arial, serif, sans-serif;
+  color: white;
+  padding: 2px;
+  max-height: 400px;
+  overflow-x: auto;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 50% auto 50%;
+  padding: 10px;
+}
