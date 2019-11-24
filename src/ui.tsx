@@ -2,17 +2,15 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./ui.css";
 
-const mapper = {
-  fontName: "fontFamily",
-  fontSize: "fontSize",
-  textDecoration: "textDecoration",
-  letterSpacing: "letterSpacing",
-  lineHeight: "lineHeight"
-};
-
-const textStyle = {};
+let textStyle = {};
 
 declare function require(path: string): any;
+
+onmessage = event => {
+  console.log(event);
+
+  textStyle = event.data.pluginMessage;
+};
 
 class App extends React.Component {
   textbox: HTMLInputElement;
@@ -23,13 +21,7 @@ class App extends React.Component {
 
   render() {
     (() => {
-      for (const node of figma.currentPage.selection) {
-        Object.keys(mapper).map(property => {
-          if (node.type === "TEXT" && property in node) {
-            textStyle[mapper[property]] = node[property];
-          }
-        });
-      }
+      parent.postMessage({ pluginMessage: { type: "scan-ui" } }, "*");
     })();
 
     return (
@@ -53,7 +45,7 @@ class App extends React.Component {
                 </b>
               </h5>
 
-              <xmp>{JSON.stringify(textStyle, undefined, 2)}</xmp>
+              <pre>{JSON.stringify(textStyle, undefined, 2)}</pre>
             </div>
           </div>
 
