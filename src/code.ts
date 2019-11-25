@@ -1,4 +1,8 @@
+
 figma.showUI(__html__);
+figma.ui.resize(650,500);
+
+
 
 const mapper = {
   fontName: "fontFamily",
