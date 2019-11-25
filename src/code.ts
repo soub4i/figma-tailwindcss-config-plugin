@@ -38,22 +38,47 @@ figma.ui.onmessage = msg => {
         if (property in node) {
           if (node.type === "TEXT") {
             if (property === "fontName") {
-              textStyle[mapper[property]] = {}[
-                node[property].name
-              ] = (node as TextStyle).fontName.family;
+              let _value: FontName = (node as TextStyle)[property];
+
+              textStyle[mapper[property]][
+                `font-${_value.family.toLocaleLowerCase()}`
+              ] = _value.family;
+            } else if (property === "fontSize") {
+              let _value: number = (node as TextStyle)[property];
+              textStyle[mapper[property]][`text-${_value}`] = `${_value}'px'`;
+            } else if (property === "letterSpacing") {
+              let _value: LetterSpacing = (node as TextStyle)[property];
+              textStyle[mapper[property]][`tracking-${_value.value}`] = `${
+                _value.value
+              }${_value.unit === "PERCENT" ? "%" : "px"}`;
+            } else if (property === "textDecoration") {
+              let _value: TextDecoration = (node as TextStyle)[property];
+              textStyle[mapper[property]][
+                `${_value.toLocaleLowerCase()}`
+              ] = `${_value.toLocaleLowerCase()}`;
+            } else if (property === "lineHeight") {
+              let _value: any = (node as TextStyle)[property];
+              if (_value.unit && _value.unit === "AUTO") {
+                textStyle[mapper[property]][
+                  `leading-normal`
+                ] = `${_value.unit}`;
+              } else {
+                textStyle[mapper[property]][`leading-${_value.value}`] = `${
+                  _value.value
+                }${_value.unit === "PERCENT" ? "%" : "px"}`;
+              }
             } else {
-              textStyle[mapper[property]] = {}[
+              textStyle[mapper[property]][
                 node[property].name
               ] = (node as TextStyle)[property];
             }
           } else if (node.type === "PAINT") {
-            if ((node as PaintStyle).paints.length > 0) {
-              for (let paint of (node as PaintStyle).paints) {
-                if (paint.type === "SOLID") {
-                  colorStyle.colors = {}[node.name] = parseRGBA(
-                    (paint as SolidPaint).color
-                  );
-                }
+            let paints: ReadonlyArray<Paint> = (node as PaintStyle).paints;
+
+            for (let i = 0; i < paints.length; i++) {
+              if (paints[0].type === "SOLID") {
+                let _value: SolidPaint = paints[0] as SolidPaint;
+                colorStyle.colors[`color-${i}`] = parseRGBA(_value.color);
               }
             }
           }
@@ -66,8 +91,6 @@ figma.ui.onmessage = msg => {
 
       if ((node as any).children) (node as any).children.forEach(walker);
     }
-
-    console.log(textStyle);
 
     figma.ui.postMessage({ textStyle, colorStyle });
   }

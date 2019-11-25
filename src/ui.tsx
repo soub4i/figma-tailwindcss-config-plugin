@@ -2,18 +2,20 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./ui.css";
 
-let textStyle = {};
+interface IState {
+  data: Object;
+}
 
+interface IProps {}
 declare function require(path: string): any;
 
-onmessage = event => {
-  console.log(event.data.pluginMessage);
-
-  textStyle = event.data.pluginMessage;
-};
-
-class App extends React.Component {
+class App extends React.Component<IProps, IState> {
   textbox: HTMLInputElement;
+
+  constructor(props) {
+    super(props);
+    this.setState({ data: {} });
+  }
 
   onCancel = () => {
     parent.postMessage({ pluginMessage: { type: "close-ui" } }, "*");
@@ -21,6 +23,19 @@ class App extends React.Component {
 
   render() {
     (() => {
+      window.onmessage = event => {
+        console.log(event.data.pluginMessage);
+
+        let result = {
+          colors: event.data.pluginMessage.colorStyle,
+          ...event.data.pluginMessage.textStyle
+        };
+
+        this.setState({
+          data: { extends: result }
+        });
+      };
+
       parent.postMessage({ pluginMessage: { type: "scan-ui" } }, "*");
     })();
 
@@ -45,7 +60,7 @@ class App extends React.Component {
                 </b>
               </h5>
 
-              <pre>{JSON.stringify(textStyle, undefined, 2)}</pre>
+              <pre>{JSON.stringify(this.state.data, undefined, 2)}</pre>
             </div>
           </div>
 
