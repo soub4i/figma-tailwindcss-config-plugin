@@ -7,7 +7,7 @@ let textStyle = {};
 declare function require(path: string): any;
 
 onmessage = event => {
-  console.log(event);
+  console.log(event.data.pluginMessage);
 
   textStyle = event.data.pluginMessage;
 };
@@ -34,7 +34,7 @@ class App extends React.Component {
             <div className="code">
               <h5>
                 <b>
-                  <i>HTML</i>
+                  <i>tailwind.config.js</i>
                 </b>
               </h5>
               <h5>
