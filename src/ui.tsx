@@ -14,7 +14,7 @@ class App extends React.Component<IProps, IState> {
 
   constructor(props) {
     super(props);
-    this.setState({ data: {} });
+    this.state = { data: {} };
   }
 
   onCancel = () => {
