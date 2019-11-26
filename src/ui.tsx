@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./ui.css";
 
+import * as template from "./template";
 interface IState {
   data: Object;
 }
@@ -21,42 +22,32 @@ class App extends React.Component<IProps, IState> {
     parent.postMessage({ pluginMessage: { type: "close-ui" } }, "*");
   };
 
-  render() {
-    (() => {
-      window.onmessage = event => {
-        console.log(event.data.pluginMessage);
+  componentDidMount() {
+    parent.postMessage({ pluginMessage: { type: "scan-ui" } }, "*");
 
-        let result = {
-          colors: event.data.pluginMessage.colorStyle,
-          ...event.data.pluginMessage.textStyle
-        };
-
-        this.setState({
-          data: { extends: result }
-        });
+    window.onmessage = event => {
+      let result = {
+        colors: event.data.pluginMessage.colorStyle,
+        ...event.data.pluginMessage.textStyle
       };
 
-      parent.postMessage({ pluginMessage: { type: "scan-ui" } }, "*");
-    })();
+      this.setState({
+        data: { extends: result, ...template }
+      });
+    };
+  }
 
+  render() {
     return (
       <div>
-        <img src={require("./logo.svg")} />
-        <h2>Tailwindcss.config.js Generator</h2>
+        <h2 className="title">Tailwindcss config Generator</h2>
 
         <div className="grid-container">
           <div className="grid-item">
             <div className="code">
               <h5>
                 <b>
-                  <i>tailwind.config.js</i>
-                </b>
-              </h5>
-              <h5>
-                <b>
-                  <i>
-                    <a href="#you_stealer!_you-copied-my-code!">Copy</a>
-                  </i>
+                  <a href="#you_stealer!_you-copied-my-code!">Copy</a>
                 </b>
               </h5>
 
