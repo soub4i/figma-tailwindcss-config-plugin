@@ -12,7 +12,7 @@ const mapper = {
 figma.ui.onmessage = async msg => {
   if (msg.type === "scan-ui") {
     let textStyle = {};
-    let colorStyle = { colors: {} };
+    let colorStyle = {  };
 
     const parseRGBA = (color: RGBA | RGB) => {
       if (!color) {
@@ -91,7 +91,7 @@ figma.ui.onmessage = async msg => {
               for (let i = 0; i < paints.length; i++) {
                 if (paints[0].type === "SOLID") {
                   let _value: SolidPaint = paints[0] as SolidPaint;
-                  colorStyle.colors[`color-${i}`] = parseRGBA(_value.color);
+                  colorStyle[`color-${i}`] = '#'+parseRGBA(_value.color);
                 }
               }
             }
