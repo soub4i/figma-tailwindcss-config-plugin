@@ -1,6 +1,5 @@
 body {
   font: 12px sans-serif;
-  text-align: center;
   margin: 20px;
 }
 button {
@@ -36,13 +35,6 @@ input:focus {
   box-shadow: inset 0 0 0 2px #18a0fb;
 }
 
-.block-50 {
-  width: 45%;
-
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
 h5 {
   margin: 0px;
   background-color: #333;
@@ -54,7 +46,6 @@ h5 {
 a {
   text-decoration: none;
   color: white;
-  float: right;
   padding: 10px;
 }
 div.code {
