@@ -1,12 +1,21 @@
 {
-  "name": "sandbox",
+  "name": "figma-tailwindcss-config-plugin",
   "version": "1.0.0",
-  "description": "",
+  "description": "Figma plugin to generate a configuration file for Tailwindcss framework",
   "main": "code.js",
+  "keywords": [
+    "figma",
+    "figma-plugin",
+    "tailwindcss",
+    "configuration",
+    "autogen"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack --watch",
+    "build": "webpack --mode=production"
   },
-  "author": "",
+  "author": "Abderrahim Soubai-Elidrisi",
   "license": "ISC",
   "dependencies": {
     "@types/react": "^16.8.23",

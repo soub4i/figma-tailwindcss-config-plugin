@@ -11,8 +11,9 @@ const mapper = {
 
 figma.ui.onmessage = async msg => {
   if (msg.type === "scan-ui") {
-    let textStyle = {};
-    let colorStyle = {  };
+    let textStyle,
+      colorStyle,
+      effectStyle = {};
 
     const parseRGBA = (color: RGBA | RGB) => {
       if (!color) {
@@ -49,10 +50,9 @@ figma.ui.onmessage = async msg => {
                 let _value: FontName = (node as TextStyle)[property];
 
                 if (_value.family) {
-                  textStyle[mapper[property]] = {};
-                  textStyle[mapper[property]][
-                    `font-${_value.family.toLocaleLowerCase()}`
-                  ] = _value.family;
+                  Array.isArray(textStyle[mapper[property]])
+                    ? textStyle[mapper[property]].push(_value.family)
+                    : (textStyle[mapper[property]] = [_value.family]);
                 }
               } else if (property === "fontSize") {
                 let _value: number = (node as TextStyle)[property];
@@ -89,10 +89,32 @@ figma.ui.onmessage = async msg => {
               let paints: ReadonlyArray<Paint> = (node as PaintStyle).paints;
 
               for (let i = 0; i < paints.length; i++) {
-                if (paints[0].type === "SOLID") {
+                if (paints[i].type === "SOLID") {
                   let _value: SolidPaint = paints[0] as SolidPaint;
-                  colorStyle[`color-${i}`] = '#'+parseRGBA(_value.color);
+                  colorStyle[`color-${i}`] = "#" + parseRGBA(_value.color);
                 }
+              }
+            } else if (node.type === "EFFECT") {
+              let effects: ReadonlyArray<Effect> = (node as EffectStyle)
+                .effects;
+
+              for (let i = 0; i < effects.length; i++) {
+                let _value: any;
+                if (
+                  effects[i].type === "DROP_SHADOW" ||
+                  effects[i].type === "INNER_SHADOW"
+                ) {
+                  _value = effects[0] as ShadowEffect;
+                } else {
+                  _value = effects[0] as BlurEffect;
+                }
+                effectStyle[`shadow-${i}`] = `${
+                  _value.type === "INNER_SHADOW" ? "inset" : ""
+                } ${_value.offset.x}px ${_value.offset.y}px ${
+                  _value.radius
+                }px  rgba(${_value.color.r}, ${_value.color.g}, ${
+                  _value.color.b
+                }, ${_value.color.a})`;
               }
             }
           }
@@ -102,15 +124,28 @@ figma.ui.onmessage = async msg => {
       }
     };
 
-    for (const node of figma.currentPage.selection) {
-      walker(node as any);
+    if (
+      figma.currentPage &&
+      figma.currentPage.selection &&
+      figma.currentPage.selection.length > 0
+    ) {
+      for (const node of figma.currentPage.selection) {
+        walker(node as any);
 
-      if (node["children"] && Array.isArray(node["children"])) {
-        node["children"].forEach(walker);
+        if (node["children"] && Array.isArray(node["children"])) {
+          node["children"].forEach(walker);
+        }
       }
-    }
 
-    figma.ui.postMessage({ textStyle, colorStyle });
+      figma.ui.postMessage({
+        textStyle,
+        colorStyle,
+        effectStyle,
+        ...{ isNodesSelected: true }
+      });
+    } else {
+      figma.ui.postMessage({ isNodesSelected: false });
+    }
   }
 
   if (msg.type === "close-ui") {
