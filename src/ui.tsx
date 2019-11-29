@@ -26,15 +26,12 @@ class App extends React.Component<IProps, IState> {
     window.onmessage = event => {
       if (event.data.pluginMessage.isNodesSelected === true) {
         const result = {
-          ...template,
-          theme: {
-            ...template.theme,
-            extends: {
-              colors: event.data.pluginMessage.colorStyle,
-              boxShadow: event.data.pluginMessage.effectStyle,
-              ...event.data.pluginMessage.textStyle
-            }
-          }
+          ...template
+        };
+        result.theme.extend = {
+          colors: event.data.pluginMessage.colorStyle,
+          boxShadow: event.data.pluginMessage.effectStyle,
+          ...event.data.pluginMessage.textStyle
         };
 
         this.setState({
@@ -56,9 +53,12 @@ class App extends React.Component<IProps, IState> {
             <h2 className="title">Tailwindcss config Generator</h2>
 
             {this.state.isNodesSelected === false ? (
-              <h4 className="text-danger">
-                Select at least one node before you run the plugin
-              </h4>
+              <br /> >
+              (
+                <h4 className="text-danger">
+                  Select at least one node before you run the plugin
+                </h4>
+              )
             ) : (
               <span></span>
             )}
