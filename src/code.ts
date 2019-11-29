@@ -6,7 +6,8 @@ const mapper = {
   fontSize: "fontSize",
   textDecoration: "textDecoration",
   letterSpacing: "letterSpacing",
-  lineHeight: "lineHeight"
+  lineHeight: "lineHeight",
+  effects: "effects"
 };
 
 figma.ui.onmessage = async msg => {
@@ -43,7 +44,7 @@ figma.ui.onmessage = async msg => {
       try {
         Object.keys(mapper).map(property => {
           if (property in node) {
-            if (node.type === "TEXT" && mapper[property]) {
+            if (node.type === "TEXT") {
               textStyle[mapper[property]] = {};
 
               if (property === "fontName") {
@@ -115,6 +116,83 @@ figma.ui.onmessage = async msg => {
                 }px  rgba(${_value.color.r}, ${_value.color.g}, ${
                   _value.color.b
                 }, ${_value.color.a})`;
+              }
+            } else {
+              if (mapper[property] === "effects") {
+                let effects: ReadonlyArray<Effect> = (node as EffectStyle)
+                  .effects;
+
+                for (let i = 0; i < effects.length; i++) {
+                  let _value: any;
+                  if (
+                    effects[i].type === "DROP_SHADOW" ||
+                    effects[i].type === "INNER_SHADOW"
+                  ) {
+                    _value = effects[0] as ShadowEffect;
+                  } else {
+                    _value = effects[0] as BlurEffect;
+                  }
+                  effectStyle[`shadow-${i}`] = `${
+                    _value.type === "INNER_SHADOW" ? "inset" : ""
+                  } ${_value.offset.x}px ${_value.offset.y}px ${
+                    _value.radius
+                  }px  rgba(${_value.color.r}, ${_value.color.g}, ${
+                    _value.color.b
+                  }, ${_value.color.a})`;
+                }
+              } else if (mapper[property] === "paints") {
+                let paints: ReadonlyArray<Paint> = (node as PaintStyle).paints;
+
+                for (let i = 0; i < paints.length; i++) {
+                  if (paints[i].type === "SOLID") {
+                    let _value: SolidPaint = paints[0] as SolidPaint;
+                    colorStyle[`color-${i}`] = "#" + parseRGBA(_value.color);
+                  }
+                }
+              } else {
+                textStyle[mapper[property]] = {};
+
+                if (property === "fontName") {
+                  let _value: FontName = (node as TextStyle)[property];
+
+                  if (_value.family) {
+                    Array.isArray(textStyle[mapper[property]])
+                      ? textStyle[mapper[property]].push(_value.family)
+                      : (textStyle[mapper[property]] = [_value.family]);
+                  }
+                } else if (property === "fontSize") {
+                  let _value: number = (node as TextStyle)[property];
+                  textStyle[mapper[property]][
+                    `text-${_value}`
+                  ] = `${_value}px'`;
+                } else if (property === "letterSpacing") {
+                  let _value: LetterSpacing = (node as TextStyle)[property];
+                  textStyle[mapper[property]][`tracking-${_value.value}`] = `${
+                    _value.value
+                  }${_value.unit === "PERCENT" ? "%" : "px"}`;
+                } else if (property === "textDecoration") {
+                  if (typeof (node as TextStyle)[property] !== "symbol") {
+                    let _value: TextDecoration = (node as TextStyle)[property];
+                    textStyle[mapper[property]][
+                      `${_value.toLocaleLowerCase()}`
+                    ] = `${_value.toLocaleLowerCase()}`;
+                  }
+                } else if (property === "lineHeight") {
+                  let _value: any = (node as TextStyle)[property];
+                  if (_value.unit && _value.unit === "AUTO") {
+                    textStyle[mapper[property]][
+                      `leading-normal`
+                    ] = `${_value.unit}`;
+                  } else {
+                    textStyle[mapper[property]][`leading-${_value.value}`] = `${
+                      _value.value
+                    }${_value.unit === "PERCENT" ? "%" : "px"}`;
+                  }
+                } else {
+                  textStyle[mapper[property]][
+                    node[property].name
+                  ] = (node as TextStyle)[property];
+                }
               }
             }
           }

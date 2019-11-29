@@ -6,7 +6,7 @@ import * as template from "./template";
 interface IState {
     data: Object;
     isNodesSelected: boolean;
-    copySuccess: string;
+    // copySuccess: string;
 }
 
 interface IProps {}
@@ -14,11 +14,7 @@ interface IProps {}
 class App extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
-        this.state = {
-            data: {},
-            isNodesSelected: true,
-            copySuccess: ""
-        };
+        this.state = { data: {}, isNodesSelected: true };
     }
 
     onCancel = () => {
@@ -31,42 +27,30 @@ class App extends React.Component<IProps, IState> {
         window.onmessage = event => {
             if (event.data.pluginMessage.isNodesSelected === true) {
                 const result = {
-                    ...template,
-                    theme: {
-                        ...template.theme,
-                        extends: {
-                            colors: event.data.pluginMessage.colorStyle,
-                            boxShadow: event.data.pluginMessage.effectStyle,
-                            ...event.data.pluginMessage.textStyle
-                        }
-                    }
+                    ...template
                 };
-
-                this.setState({
-                    data: result,
-                    isNodesSelected: true
-                });
-            } else {
-                this.setState({
-                    isNodesSelected: false
-                });
+                result.theme.extend = {
+                    colors: event.data.pluginMessage.colorStyle,
+                    boxShadow: event.data.pluginMessage.effectStyle,
+                    ...event.data.pluginMessage.textStyle
+                };
             }
         };
     }
 
-    copyToClipboard = e => {
-        var textField = document.getElementById("data");
-        var range = document.createRange();
-        var selection = window.getSelection();
-        
-        range.selectNodeContents(textField);
-        selection.removeAllRanges();
-        selection.addRange(range);
+    // copyToClipboard = e => {
+    //     var textField = document.getElementById("data");
+    //     var range = document.createRange();
+    //     var selection = window.getSelection();
 
-        document.execCommand("copy");
+    //     range.selectNodeContents(textField);
+    //     selection.removeAllRanges();
+    //     selection.addRange(range);
 
-        this.setState({ copySuccess: "Copied!" });
-    };
+    //     document.execCommand("copy");
+
+    //     this.setState({ copySuccess: "Copied!" });
+    // };
 
     render() {
         return (
@@ -76,29 +60,26 @@ class App extends React.Component<IProps, IState> {
                         <h2 className="title">Tailwindcss config Generator</h2>
 
                         {this.state.isNodesSelected === false ? (
-                            <h4 className="text-danger">
-                                Select at least one node before you run the
-                                plugin
-                            </h4>
+                            <br /> >
+                            (
+                                <h4 className="text-danger">
+                                    Select at least one node before you run the
+                                    plugin
+                                </h4>
+                            )
                         ) : (
                             <span></span>
                         )}
 
-                        {document.queryCommandSupported("copy") && (
-                            <button
-                                className="button button-copy"
-                                onClick={this.copyToClipboard}
-                            >
-                                Copy
-                            </button>
-                        )}
-                        {this.state.copySuccess}
+                        <a className="button button-copy" href="#">
+                            Copy
+                        </a>
                     </div>
                 </div>
 
                 <div className="row">
                     <div className="column">
-                        <pre className="code" id="data">
+                        <pre className="code">
                             {JSON.stringify(this.state.data, undefined, 2)}
                         </pre>
                     </div>
