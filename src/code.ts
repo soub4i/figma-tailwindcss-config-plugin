@@ -11,8 +11,8 @@ const mapper = {
 
 figma.ui.onmessage = async msg => {
   if (msg.type === "scan-ui") {
-    let textStyle,
-      colorStyle,
+    let textStyle = {},
+      colorStyle = {},
       effectStyle = {};
 
     const parseRGBA = (color: RGBA | RGB) => {
@@ -43,7 +43,7 @@ figma.ui.onmessage = async msg => {
       try {
         Object.keys(mapper).map(property => {
           if (property in node) {
-            if (node.type === "TEXT") {
+            if (node.type === "TEXT" && mapper[property]) {
               textStyle[mapper[property]] = {};
 
               if (property === "fontName") {
