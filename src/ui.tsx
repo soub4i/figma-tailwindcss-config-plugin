@@ -6,7 +6,7 @@ import * as template from "./template";
 interface IState {
     data: Object;
     isNodesSelected: boolean;
-    // copySuccess: string;
+    copySuccess: string;
 }
 
 interface IProps {}
@@ -14,7 +14,7 @@ interface IProps {}
 class App extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
-        this.state = { data: {}, isNodesSelected: true };
+        this.state = { data: {}, isNodesSelected: true, copySuccess: "" };
     }
 
     onCancel = () => {
@@ -26,6 +26,7 @@ class App extends React.Component<IProps, IState> {
 
         window.onmessage = event => {
             if (event.data.pluginMessage.isNodesSelected === true) {
+                console.log(event.data.pluginMessage);
                 const result = {
                     ...template
                 };
@@ -34,23 +35,33 @@ class App extends React.Component<IProps, IState> {
                     boxShadow: event.data.pluginMessage.effectStyle,
                     ...event.data.pluginMessage.textStyle
                 };
+                console.log(result);
+
+                this.setState({
+                    data: result,
+                    isNodesSelected: true
+                });
+            } else {
+                this.setState({
+                    isNodesSelected: false
+                });
             }
         };
     }
 
-    // copyToClipboard = e => {
-    //     var textField = document.getElementById("data");
-    //     var range = document.createRange();
-    //     var selection = window.getSelection();
+    copyToClipboard = e => {
+        var textField = document.getElementById("code");
+        var range = document.createRange();
+        var selection = window.getSelection();
 
-    //     range.selectNodeContents(textField);
-    //     selection.removeAllRanges();
-    //     selection.addRange(range);
+        range.selectNodeContents(textField);
+        selection.removeAllRanges();
+        selection.addRange(range);
 
-    //     document.execCommand("copy");
+        document.execCommand("copy");
 
-    //     this.setState({ copySuccess: "Copied!" });
-    // };
+        this.setState({ copySuccess: "Copied!" });
+    };
 
     render() {
         return (
@@ -58,28 +69,28 @@ class App extends React.Component<IProps, IState> {
                 <div className="row">
                     <div className="column">
                         <h2 className="title">Tailwindcss config Generator</h2>
-
                         {this.state.isNodesSelected === false ? (
                             <br /> >
                             (
                                 <h4 className="text-danger">
-                                    Select at least one node before you run the
-                                    plugin
+                                    Select at least one node before you run the plugin
                                 </h4>
                             )
                         ) : (
                             <span></span>
                         )}
-
-                        <a className="button button-copy" href="#">
-                            Copy
-                        </a>
+                        {document.queryCommandSupported("copy") && (
+                            <button className="button button-copy" onClick={this.copyToClipboard}>
+                                Copy
+                            </button>
+                        )}
+                        {this.state.copySuccess}
                     </div>
                 </div>
 
                 <div className="row">
                     <div className="column">
-                        <pre className="code">
+                        <pre className="code" id="code">
                             {JSON.stringify(this.state.data, undefined, 2)}
                         </pre>
                     </div>
