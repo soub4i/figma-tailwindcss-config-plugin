@@ -1,13 +1,19 @@
 figma.showUI(__html__);
 figma.ui.resize(750, 575);
 
+interface Color {
+  readonly r: number;
+  readonly g: number;
+  readonly b: number;
+  readonly a?: number;
+}
+
 const mapper = {
   fontName: "fontFamily",
   fontSize: "fontSize",
   textDecoration: "textDecoration",
   letterSpacing: "letterSpacing",
-  lineHeight: "lineHeight",
-  effects: "effects"
+  lineHeight: "lineHeight"
 };
 
 figma.ui.onmessage = async msg => {
@@ -16,24 +22,21 @@ figma.ui.onmessage = async msg => {
       colorStyle = {},
       effectStyle = {};
 
-    const parseRGBA = (color: RGBA | RGB) => {
-      if (!color) {
-        return;
-      }
+    const parseRGBA = (color: Color) => {
+      let r = (+color.r).toString(16),
+        g = (+color.g).toString(16),
+        b = (+color.b).toString(16),
+        a =
+          color.a !== undefined
+            ? Math.round(+color.a * 255).toString(16)
+            : Math.round(1 * 255).toString(16);
 
-      let hex =
-        (color.r | (1 << 8)).toString(16).slice(1) +
-        (color.g | (1 << 8)).toString(16).slice(1) +
-        (color.b | (1 << 8)).toString(16).slice(1);
+      if (r.length == 1) r = "0" + r;
+      if (g.length == 1) g = "0" + g;
+      if (b.length == 1) b = "0" + b;
+      if (a.length == 1) a = "0" + a;
 
-      let alpha: any = 1;
-      if (color.r) {
-        alpha = 1;
-      }
-
-      alpha = ((alpha * 255) | (1 << 8)).toString(16).slice(1);
-
-      return hex + alpha;
+      return "#" + r + g + b + a;
     };
 
     const handleText = (property, node) => {
@@ -49,12 +52,16 @@ figma.ui.onmessage = async msg => {
         }
       } else if (property === "fontSize") {
         let _value: number = (node as TextStyle)[property];
-        textStyle[mapper[property]][`text-${_value}`] = `${_value}px'`;
+        textStyle[mapper[property]][
+          `text-${_value.toFixed(0)}`
+        ] = `${_value.toFixed(1)}px'`;
       } else if (property === "letterSpacing") {
         let _value: LetterSpacing = (node as TextStyle)[property];
-        textStyle[mapper[property]][`tracking-${_value.value}`] = `${
-          _value.value
-        }${_value.unit === "PERCENT" ? "%" : "px"}`;
+        textStyle[mapper[property]][
+          `tracking-${_value.value.toFixed(0)}`
+        ] = `${_value.value.toFixed(2)}${
+          _value.unit === "PERCENT" ? "%" : "px"
+        }`;
       } else if (property === "textDecoration") {
         if (typeof (node as TextStyle)[property] !== "symbol") {
           let _value: TextDecoration = (node as TextStyle)[property];
@@ -87,15 +94,17 @@ figma.ui.onmessage = async msg => {
           effects[i].type === "DROP_SHADOW" ||
           effects[i].type === "INNER_SHADOW"
         ) {
-          _value = effects[0] as ShadowEffect;
+          _value = effects[i] as ShadowEffect;
         } else {
-          _value = effects[0] as BlurEffect;
+          _value = effects[i] as BlurEffect;
         }
-        effectStyle[`shadow-${i}`] = `${
+        effectStyle[`shadow-${i + 1}`] = `${
           _value.type === "INNER_SHADOW" ? "inset" : ""
-        } ${_value.offset.x}px ${_value.offset.y}px ${_value.radius}px  rgba(${
-          _value.color.r
-        }, ${_value.color.g}, ${_value.color.b}, ${_value.color.a})`;
+        } ${_value.offset.x.toFixed(0)}px ${_value.offset.y.toFixed(
+          0
+        )}px ${_value.radius.toFixed(0)}px  rgba(${_value.color.r}, ${
+          _value.color.g
+        }, ${_value.color.b}, ${_value.color.a.toFixed(2)})`;
       }
     };
 
@@ -104,8 +113,8 @@ figma.ui.onmessage = async msg => {
 
       for (let i = 0; i < paints.length; i++) {
         if (paints[i].type === "SOLID") {
-          let _value: SolidPaint = paints[0] as SolidPaint;
-          colorStyle[`color-${i}`] = "#" + parseRGBA(_value.color);
+          let _value: SolidPaint = paints[i] as SolidPaint;
+          colorStyle[`color-${i + 1}`] = "#" + parseRGBA(_value.color);
         }
       }
     };
