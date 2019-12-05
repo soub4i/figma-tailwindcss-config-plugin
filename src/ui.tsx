@@ -93,7 +93,9 @@ class App extends React.Component<IProps, IState> {
 
         <div className="row">
           <div className="column">
-            <button className="button button-generate">Generate</button>
+            <button className="button button-generate" disabled={true}>
+              Generate
+            </button>
             <button className="button button-cancel" onClick={this.onCancel}>
               Cancel
             </button>
