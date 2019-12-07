@@ -6,6 +6,7 @@ import * as template from "./template";
 interface IState {
   data: Object;
   isNodesSelected: boolean;
+  isGenerated: boolean;
 }
 
 interface IProps {}
@@ -13,37 +14,64 @@ interface IProps {}
 class App extends React.Component<IProps, IState> {
   constructor(props) {
     super(props);
-    this.state = { data: {}, isNodesSelected: true };
+    this.state = { data: {}, isNodesSelected: true, isGenerated: false };
   }
 
   onCancel = () => {
     parent.postMessage({ pluginMessage: { type: "close-ui" } }, "*");
   };
 
+  onGenerate = () => {
+      if (this.state.isGenerated)
+      {
+         return
+      }
+
+      this.setState({
+        data: this.generateDataWithTemplate(),
+        isNodesSelected: true,
+        isGenerated: true
+      });
+  };
+
   componentDidMount() {
     parent.postMessage({ pluginMessage: { type: "scan-ui" } }, "*");
 
     window.onmessage = event => {
-      if (event.data.pluginMessage.isNodesSelected === true) {
-        const result = {
-          ...template
-        };
-        result.theme.extend = {
-          colors: event.data.pluginMessage.colorStyle,
-          boxShadow: event.data.pluginMessage.effectStyle,
-          ...event.data.pluginMessage.textStyle
-        };
+       if (event.data.pluginMessage.isNodesSelected !== true) {
+          this.setState({
+            isNodesSelected: false
+          });
 
-        this.setState({
-          data: result,
-          isNodesSelected: true
-        });
-      } else {
-        this.setState({
-          isNodesSelected: false
-        });
-      }
+          return
+       }
+
+      this.setState({
+        data: this.generateExtendObject(event),
+        isNodesSelected: true
+      });
     };
+  }
+
+  generateDataWithTemplate()
+  {
+     const result = {
+       ...template
+     };
+
+     result.theme = Object.assign(result.theme, this.state.data)
+
+     return result
+  }
+
+  generateExtendObject(event) {
+    return {
+      extend: {
+        colors: event.data.pluginMessage.colorStyle,
+        boxShadow: event.data.pluginMessage.effectStyle,
+        ...event.data.pluginMessage.textStyle
+      }
+    }
   }
 
   copyToClipboard = e => {
@@ -93,7 +121,7 @@ class App extends React.Component<IProps, IState> {
 
         <div className="row">
           <div className="column">
-            <button className="button button-generate" disabled={true}>
+            <button className="button button-generate" onClick={this.onGenerate}>
               Generate
             </button>
             <button className="button button-cancel" onClick={this.onCancel}>
