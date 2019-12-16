@@ -1,6 +1,6 @@
 # Figma + Tailwindcss = <3
 
-This prpject is a small plugin for Figma to generate easily tailwindcss config file.
+This project is a small plugin for Figma to generate easily tailwind css config file directly from design.
 
 ## Quickstart
 
